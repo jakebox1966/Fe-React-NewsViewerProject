@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import NewsItem from './NewsItem'
 import axios from 'axios'
+import usePromise from '../util/usePromise'
 
 const NewsListBlock = styled.div`
     box-sizing: border-box;
@@ -26,27 +27,35 @@ const NewsListBlock = styled.div`
 `
 
 const NewsList = ({ category }) => {
-    const [articles, setArticles] = useState(null)
-    const [loading, setLoading] = useState(false)
+    // usePromise Custom Hook 적용
+    // const [articles, setArticles] = useState(null)
+    // const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        // async를 사용하는 함수 따로 선언
+    // useEffect(() => {
+    //     // async를 사용하는 함수 따로 선언
+    //
+    //     const fetchData = async () => {
+    //         setLoading(true)
+    //         try {
+    //             // category 값에 따라 요청할 주소에 쿼리스트링으로 추가된다.
+    //             const query = category === 'all' ? '' : `&category=${category}`
+    //             const response = await axios.get(
+    //                 `https://newsapi.org/v2/top-headlines?country=kr${query}&apiKey=fd3c663915584bb9a394cd406d50780e`,
+    //             )
+    //             setArticles(response.data.articles)
+    //         } catch (e) {
+    //             console.log(e)
+    //         }
+    //         setLoading(false)
+    //     }
+    //     fetchData()
+    // }, [category])
 
-        const fetchData = async () => {
-            setLoading(true)
-            try {
-                // category 값에 따라 요청할 주소에 쿼리스트링으로 추가된다.
-                const query = category === 'all' ? '' : `&category=${category}`
-                const response = await axios.get(
-                    `https://newsapi.org/v2/top-headlines?country=kr${query}&apiKey=fd3c663915584bb9a394cd406d50780e`,
-                )
-                setArticles(response.data.articles)
-            } catch (e) {
-                console.log(e)
-            }
-            setLoading(false)
-        }
-        fetchData()
+    const [loading, response, error] = usePromise(() => {
+        const query = category === 'all' ? '' : `&category=${category}`
+        return axios.get(
+            `https://newsapi.org/v2/top-headlines?country=kr${query}&apiKey=fd3c663915584bb9a394cd406d50780e`,
+        )
     }, [category])
 
     // 대기 중일 때
@@ -56,11 +65,25 @@ const NewsList = ({ category }) => {
     }
 
     // 아직 article 값이 설정되지 않았을 때
-    if (!articles) {
+    // usePromise Custom Hook 적용
+    // if (!articles) {
+    //     return null
+    // }
+
+    if (!response) {
         return null
     }
 
+    // usePromise Custom Hook 적용
+    // 에러가 발생했을 때
+    if (error) {
+        return <NewsListBlock>에러 발생!</NewsListBlock>
+    }
+
     // articles 값이 유효할 때
+    // usePromise Custom Hook 적용
+
+    const { articles } = response.data
     return (
         <NewsListBlock>
             {articles.map((article) => (
