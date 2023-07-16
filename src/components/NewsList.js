@@ -25,7 +25,7 @@ const NewsListBlock = styled.div`
     }
 `
 
-const NewsList = () => {
+const NewsList = ({ category }) => {
     const [articles, setArticles] = useState(null)
     const [loading, setLoading] = useState(false)
 
@@ -35,8 +35,10 @@ const NewsList = () => {
         const fetchData = async () => {
             setLoading(true)
             try {
+                // category 값에 따라 요청할 주소에 쿼리스트링으로 추가된다.
+                const query = category === 'all' ? '' : `&category=${category}`
                 const response = await axios.get(
-                    'https://newsapi.org/v2/top-headlines?country=kr&apiKey=fd3c663915584bb9a394cd406d50780e',
+                    `https://newsapi.org/v2/top-headlines?country=kr${query}&apiKey=fd3c663915584bb9a394cd406d50780e`,
                 )
                 setArticles(response.data.articles)
             } catch (e) {
@@ -45,7 +47,7 @@ const NewsList = () => {
             setLoading(false)
         }
         fetchData()
-    }, [])
+    }, [category])
 
     // 대기 중일 때
 
@@ -53,10 +55,12 @@ const NewsList = () => {
         return <NewsListBlock>대기중 ...</NewsListBlock>
     }
 
+    // 아직 article 값이 설정되지 않았을 때
     if (!articles) {
         return null
     }
 
+    // articles 값이 유효할 때
     return (
         <NewsListBlock>
             {articles.map((article) => (
